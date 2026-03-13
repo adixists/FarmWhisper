@@ -7,6 +7,9 @@
 
 > An AI-powered voice & vision assistant built for **Indian farmers** — helping them diagnose crops, get real-time weather, ask questions by voice, and connect with the farming community.
 
+<img src="screenshot.png" alt="FarmWhisper App Screenshot" width="300" />
+<br/>
+
 [![FastAPI](https://img.shields.io/badge/Backend-FastAPI-009688?style=flat-square&logo=fastapi)](https://fastapi.tiangolo.com/)
 [![React](https://img.shields.io/badge/Frontend-React%2018-61dafb?style=flat-square&logo=react)](https://react.dev/)
 [![Gemini](https://img.shields.io/badge/AI-Google%20Gemini-4285F4?style=flat-square&logo=google)](https://aistudio.google.com/)

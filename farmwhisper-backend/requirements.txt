@@ -1,0 +1,12 @@
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+python-multipart==0.0.6
+numpy==1.24.3
+opencv-python==4.8.1.78
+speechrecognition==3.10.0
+pydub==0.25.1
+google-generativeai==0.8.3
+python-dotenv==1.0.0
+requests==2.31.0
+pytest==7.4.3
+httpx==0.25.0

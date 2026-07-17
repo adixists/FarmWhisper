@@ -31,7 +31,7 @@ FarmWhisper is an AI Voice & Vision Assistant for Farmers, designed to help agri
 - Upvoting system for valuable contributions
 - Collaborative problem-solving
 
-## 🛠️ Tech Stack
+## 🛠️ Tech Stacks
 
 ### Frontend
 - **React 18** with TypeScript

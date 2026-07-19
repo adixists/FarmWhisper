@@ -1,0 +1,29 @@
+services:
+  - type: web
+    name: farmwhisper-backend
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.9.15
+      - key: MONGODB_URI
+        sync: false
+      - key: OPENWEATHER_API_KEY
+        sync: false
+      - key: DATABASE_NAME
+        value: farmwhisper
+
+  - type: pserv
+    name: mongodb
+    env: docker
+    repo: mongo:5.0
+    disk:
+      name: mongodb-data
+      mountPath: /data/db
+      sizeGB: 10
+    envVars:
+      - key: MONGO_INITDB_ROOT_USERNAME
+        value: admin
+      - key: MONGO_INITDB_ROOT_PASSWORD
+        sync: false

@@ -1,153 +1,112 @@
-# FarmWhisper
+<div align="center">
+  <img src="https://img.shields.io/badge/Status-Active-success.svg" alt="Status" />
+  <img src="https://img.shields.io/badge/Platform-Web%20%7C%20Mobile-blue.svg" alt="Platform" />
+  <img src="https://img.shields.io/badge/Backend-FastAPI-009688.svg" alt="FastAPI" />
+  <img src="https://img.shields.io/badge/Frontend-React-61DAFB.svg" alt="React" />
+  
+  <h1>🌾 FarmWhisper</h1>
+  <p><b>An AI-Powered Voice & Vision Assistant for Farmers</b></p>
+</div>
 
-FarmWhisper is an AI Voice & Vision Assistant for Farmers, designed to help agricultural communities with crop analysis, weather forecasting, and community knowledge sharing.
+<br />
 
-![FarmWhisper Demo](https://placehold.co/800x400?text=FarmWhisper+Demo+Screenshot)
+<div align="center">
+  <img src="docs/screenshot.png" alt="FarmWhisper AI Analysis UI" width="600" style="border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
+  <p><i>Real-time crop analysis and structured AI treatment plans.</i></p>
+</div>
 
-## 🌟 Key Features
+---
 
-### 📸 Crop Image Analysis
-- Upload crop photos for AI-powered analysis
-- Get detailed health scores and issue identification
-- Receive actionable treatment recommendations
+## 📖 Overview
 
-### 🎙️ Voice-Based Queries
-- Hands-free farming assistance through voice commands
-- Natural language processing for intuitive interactions
-- Immediate responses to farming questions
+**FarmWhisper** is a comprehensive technology solution designed to empower farmers in India (and globally) with real-time, actionable insights. By leveraging cutting-edge Artificial Intelligence (Google Gemini Vision) and intuitive interfaces, FarmWhisper bridges the gap between traditional farming and modern agritech.
 
-### 📖 Story-Based Advisory
-- AI-generated farming wisdom in engaging story format
-- Play/Pause functionality for story narration
-- Progress tracking with visual indicators
+Whether a farmer needs to know the weather, diagnose a diseased crop, or ask a question using only their voice, FarmWhisper provides accurate, bilingual (Hindi & English), and structured answers.
 
-### ☀️ Weather Forecasting
-- Location-based weather predictions
-- Critical alerts for farming decisions
-- Integration with agricultural calendars
+## ✨ Key Features
 
-### 👥 Community Platform
-- Knowledge sharing among farming communities
-- Upvoting system for valuable contributions
-- Collaborative problem-solving
+### 📸 1. AI Crop Pathology & Vision Analysis
+Upload or snap a picture of your crop, leaf, or soil, and our strict AI Vision Pipeline will analyze it:
+- **Visual Grounding:** The AI first verifies if the image is agricultural to prevent hallucinations.
+- **Identification:** Automatically detects the crop species (e.g., Tomato, Cabbage, Wheat).
+- **Diagnosis:** Detects pests (like Aphid infestations), diseases (like Early Blight), or nutrient deficiencies.
+- **Structured Treatment Plans:** Returns a strictly formatted treatment plan with:
+  - 💧 **Immediate Remedies**
+  - 🐛 **Specific Pesticides/Fertilizers Needed**
+  - 🌿 **Preventative Care Instructions**
 
-## 🛠️ Tech Stack
+### 🎙️ 2. Voice-to-Text Assistant (STT & TTS)
+Designed for accessibility, farmers can simply speak their problems into the app's microphone. The app converts their voice into text, processes the agricultural query using AI, and returns a spoken solution.
 
-### Frontend
-- **React 18** with TypeScript
-- **Tailwind CSS** for responsive styling
-- **Radix UI** components for accessibility
-- **Vite** for fast development
+### 🌤️ 3. Real-Time Weather Monitoring
+Farm dashboard integrations to monitor real-time weather conditions, ensuring farmers know exactly when to water, harvest, or apply fertilizers.
 
-### Backend
-- **Python FastAPI** for high-performance APIs
-- **TensorFlow** for image analysis
-- **MongoDB** for data persistence
-- **SpeechRecognition** for voice processing
+### 👥 4. Community Hub
+A built-in community feature where farmers can share knowledge, ask questions, and learn from other local experts.
+
+---
+
+## 🛠️ Technology Stack
+
+**Frontend:**
+*   React (Vite)
+*   Tailwind CSS (for responsive, modern UI)
+*   Lucide React (Icons)
+*   Web Speech API (for Voice integration)
+
+**Backend:**
+*   Python & FastAPI
+*   Google Generative AI (Gemini Flash) for Vision and NLP
+*   Pydantic (for strictly typed JSON schemas)
+
+---
 
 ## 🚀 Getting Started
 
 ### Prerequisites
-- Node.js (v14 or higher)
-- Python (v3.9 or higher)
-- MongoDB (for production)
+*   Node.js & npm (for frontend)
+*   Python 3.10+ (for backend)
+*   Google Gemini API Key
+*   OpenWeatherMap API Key
 
 ### Installation
 
-1. Clone the repository:
-```bash
-git clone https://github.com/adixists/FarmWhisper.git
-cd FarmWhisper
-```
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/adixists/FarmWhisper.git
+   cd FarmWhisper
+   ```
 
-2. Install frontend dependencies:
-```bash
-npm install
-```
+2. **Setup the Backend:**
+   ```bash
+   cd farmwhisper-backend
+   python -m venv venv
+   source venv/bin/activate  # Or `venv\Scripts\activate` on Windows
+   pip install -r requirements.txt
+   ```
+   *Create a `.env` file in the backend folder:*
+   ```env
+   GOOGLE_GEMINI_API_KEY=your_gemini_key_here
+   OPENWEATHER_API_KEY=your_openweather_key_here
+   ```
+   *Run the backend:*
+   ```bash
+   python -m uvicorn app.main:app --reload
+   ```
 
-3. Install backend dependencies:
-```bash
-cd farmwhisper-backend
-pip install -r requirements.txt
-```
+3. **Setup the Frontend:**
+   ```bash
+   # From the root directory
+   npm install
+   npm run dev
+   ```
+   *The app will be running at `http://localhost:3000`*
 
-### Running the Application
-
-#### Start the Backend Server
-```bash
-cd farmwhisper-backend
-python -m uvicorn app.simple_main:app --reload --host 0.0.0.0 --port 8000
-```
-
-#### Start the Frontend Server
-```bash
-# In a new terminal, from the root directory
-npm run dev
-```
-
-The application will be available at:
-- Frontend: http://localhost:3000
-- Backend API: http://localhost:8000
-- API Documentation: http://localhost:8000/docs
-
-## 📁 Project Structure
-
-```
-FarmWhisper/
-├── src/                    # Frontend React components
-│   ├── components/         # UI components for each screen
-│   ├── services/           # API service layer
-│   └── figma/             # Image components
-├── farmwhisper-backend/    # Python FastAPI backend
-│   ├── app/
-│   │   ├── main.py        # Main FastAPI application
-│   │   ├── routes/        # API route handlers
-│   │   ├── services/      # Business logic
-│   │   └── models/        # Data models
-│   └── requirements.txt   # Python dependencies
-├── README.md              # This file
-└── RUNNING.md            # Detailed running instructions
-```
-
-## 🔄 API Endpoints
-
-| Endpoint | Method | Description |
-|---------|--------|-------------|
-| `/voice/query` | POST | Process voice queries |
-| `/crop/analyze` | POST | Analyze crop images |
-| `/advice/story` | POST | Generate story-based advisories |
-| `/weather/forecast` | GET | Get weather by coordinates |
-| `/weather/location` | GET | Get weather by location name |
-| `/community/` | GET/POST | List/create community posts |
-| `/community/upvote` | POST | Upvote posts |
-| `/tts/narrate` | POST | Convert text to speech |
-
-## 🧪 Testing
-
-### Frontend Tests
-```bash
-npm test
-```
-
-### Backend Tests
-```bash
-cd farmwhisper-backend
-pytest
-```
+---
 
 ## 🤝 Contributing
+Contributions are welcome! Please feel free to submit a Pull Request.
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a pull request
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- Thanks to all contributors who have helped shape FarmWhisper
-- Inspired by the need to empower farming communities with technology
+<div align="center">
+  <i>Built with ❤️ for Farmers</i>
+</div>

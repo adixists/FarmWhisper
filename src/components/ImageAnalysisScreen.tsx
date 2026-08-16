@@ -102,8 +102,8 @@ export function ImageAnalysisScreen() {
     try {
       const result = await analyzeCropImage(file);
       setAnalysisResult(result);
-    } catch (err) {
-      setError('फोटो विश्लेषण में समस्या। दोबारा कोशिश करें। (Failed to analyze image)');
+    } catch (err: any) {
+      setError(err?.message || 'फोटो विश्लेषण में समस्या। दोबारा कोशिश करें। (Failed to analyze image)');
       console.error('Image analysis error:', err);
     } finally {
       setIsAnalyzing(false);

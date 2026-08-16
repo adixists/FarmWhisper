@@ -71,9 +71,17 @@ export async function analyzeCropImage(imageBlob: Blob) {
   });
 
   if (!response.ok) {
-    const errorText = await response.text();
-    console.error('Backend error:', errorText);
-    throw new Error(`Crop analysis failed with status ${response.status}`);
+    let errorDetail = `Crop analysis failed with status ${response.status}`;
+    try {
+      const errJson = await response.json();
+      if (errJson.detail) {
+        errorDetail = errJson.detail;
+      }
+    } catch (_) {
+      // ignore json parse error
+    }
+    console.error('Backend error:', errorDetail);
+    throw new Error(errorDetail);
   }
 
   return await response.json();

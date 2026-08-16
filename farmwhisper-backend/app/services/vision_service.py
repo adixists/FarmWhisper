@@ -34,35 +34,58 @@ class VisionService:
             model = genai.GenerativeModel('gemini-flash-latest')
             
             prompt = """
-            You are a strict, expert agricultural computer vision AI. You must follow this multi-step pipeline exactly:
+            You are a strict, expert agricultural computer vision AI and crop doctor. Follow this pipeline:
             
             Step 1: VALIDATION
-            Examine the image. Does it clearly show a plant, crop, leaf, soil, or agricultural field? 
-            If it is a blank image, a random object (like a car), or a person, set `is_agricultural` to False.
+            Examine the image carefully. Does it contain agricultural content such as a plant, crop, vegetable, fruit, grain, ear of wheat/rice, leaf, soil, field, farm pest, or farm produce?
+            - Set `is_agricultural` to True if it depicts any plant, leaf, crop, grain, harvest, agricultural field, farm pest, or farm scene.
+            - Set `is_agricultural` to False ONLY if it is completely non-agricultural (e.g. a vehicle, electronic gadget, indoor furniture, human portrait, or a blank/solid color image).
             
             Step 2: IDENTIFICATION
-            If agricultural, identify the exact crop species or soil type.
+            If agricultural, identify the exact crop species, plant name, or soil type in both English and Hindi (e.g. 'Wheat (गेहूँ)', 'Chilli / Pepper (मिर्च)', 'Tomato (टमाटर)').
             
-            Step 3: PATHOLOGY DIAGNOSIS
-            Analyze the visual evidence ONLY. Do you see spots, yellowing, wilting, insects, or fungal growth? 
-            Do not guess diseases that are not visually supported by the image.
+            Step 3: PATHOLOGY & HEALTH DIAGNOSIS
+            Analyze visual symptoms: pests (aphids, borers, etc.), fungal/bacterial spots, rust, blight, leaf curl, wilting, chlorosis/yellowing, nutrient deficiency, or confirm if the plant is healthy and maturing.
             
             Step 4: STRUCTURED SOLUTION
-            Based on Steps 2 and 3, formulate a treatment plan. Include specific names of pesticides/fertilizers and dosages.
+            Provide a realistic treatment and care plan:
+            - fault_description: clear diagnosis based on the visual evidence in English and Hindi.
+            - immediate_remedy: immediate actionable steps.
+            - pesticides_fertilizers_required: specific brand names, active chemicals, or organic fertilizers with dosage.
+            - preventative_care: best cultural practices and prevention.
             
-            Respond strictly in English and Hindi for text fields where applicable to assist Indian farmers.
-            Return the output adhering exactly to the provided JSON schema.
+            Return the output adhering strictly to the JSON schema.
             """
             
             # Use the response_schema to enforce strictly typed JSON output
-            # Note: response_schema is passed to generation_config
-            response = model.generate_content(
-                [prompt, img],
-                generation_config=genai.GenerationConfig(
-                    response_mime_type="application/json",
-                    response_schema=AnalysisResponse
-                )
-            )
+            # Implement retry logic for free tier rate limits (429 ResourceExhausted)
+            import time
+            from google.api_core import exceptions as google_exceptions
+            
+            max_retries = 3
+            retry_delay = 5
+            response = None
+            
+            for attempt in range(max_retries):
+                try:
+                    response = model.generate_content(
+                        [prompt, img],
+                        generation_config=genai.GenerationConfig(
+                            response_mime_type="application/json",
+                            response_schema=AnalysisResponse
+                        )
+                    )
+                    break # Success, exit retry loop
+                except google_exceptions.ResourceExhausted as e:
+                    if attempt < max_retries - 1:
+                        print(f"Rate limit hit. Retrying in {retry_delay} seconds (Attempt {attempt+1}/{max_retries})...")
+                        time.sleep(retry_delay)
+                        retry_delay *= 2 # Exponential backoff
+                    else:
+                        raise HTTPException(
+                            status_code=429, 
+                            detail="Our AI service is currently busy due to high demand. Please try uploading the image again in about 15 seconds."
+                        )
             
             # The response text is guaranteed to be a valid JSON matching the Pydantic schema
             response_json = json.loads(response.text)

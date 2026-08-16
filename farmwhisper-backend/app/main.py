@@ -103,41 +103,33 @@ async def generate_story_advisory(request: dict):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Advisory generation failed: {str(e)}")
 
+from app.services.weather_service import get_weather_data, get_weather_by_location
+
 # Weather endpoints
 @app.get("/weather/forecast")
 async def get_weather_forecast(lat: float, lon: float):
     """
-    Get weather forecast for a specific location using latitude and longitude.
+    Get live weather forecast for a specific location using latitude and longitude.
     """
     try:
-        # In a real implementation, you would call a weather API
-        # For this demo, we'll return mock data
-        return {
-            "temperature": 28.5,
-            "humidity": 65,
-            "rain_probability": 30,
-            "description": "Partly cloudy",
-            "location": f"Coordinates: {lat}, {lon}"
-        }
+        weather_res = get_weather_data(lat, lon)
+        return weather_res.dict() if hasattr(weather_res, 'dict') else weather_res
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         raise HTTPException(status_code=500, detail=f"Weather data retrieval failed: {str(e)}")
 
 @app.get("/weather/location")
-async def get_weather_by_location(location: str):
+async def get_weather_by_location_endpoint(location: str):
     """
-    Get weather forecast for a specific location by name.
+    Get live weather forecast for a specific location by city/town name.
     """
     try:
-        # In a real implementation, you would call a weather API
-        # For this demo, we'll return mock data
-        return {
-            "temperature": 28.5,
-            "humidity": 65,
-            "rain_probability": 30,
-            "description": "Partly cloudy",
-            "location": location
-        }
+        weather_res = get_weather_by_location(location)
+        return weather_res.dict() if hasattr(weather_res, 'dict') else weather_res
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         raise HTTPException(status_code=500, detail=f"Weather data retrieval failed: {str(e)}")
 
 # Community endpoints

@@ -1,6 +1,6 @@
 import os
 import requests
-from typing import Optional
+from typing import Optional, List, Dict, Any
 from app.models.models import WeatherResponse
 from dotenv import load_dotenv
 
@@ -32,6 +32,16 @@ WEATHER_CODE_MAP = {
     96: ("Thunderstorm with slight hail", "तूफान और ओलावृष्टि"),
     99: ("Thunderstorm with heavy hail", "भारी तूफान और ओलावृष्टि")
 }
+
+DAY_LABELS = [
+    ("आज (Today)", "Today"),
+    ("कल (Tomorrow)", "Tomorrow"),
+    ("परसों (Day 3)", "In 2 Days"),
+    ("3 दिन बाद (Day 4)", "In 3 Days"),
+    ("4 दिन बाद (Day 5)", "In 4 Days"),
+    ("5 दिन बाद (Day 6)", "In 5 Days"),
+    ("6 दिन बाद (Day 7)", "In 6 Days")
+]
 
 def resolve_location_name(lat: float, lon: float) -> str:
     """
@@ -123,6 +133,75 @@ def get_weather_data(lat: float, lon: float) -> WeatherResponse:
         description="Partly cloudy (आंशिक बादल)",
         location=f"GPS: {round(lat, 2)}, {round(lon, 2)}"
     )
+
+def get_multiday_forecast(lat: float, lon: float, days: int = 4) -> Dict[str, Any]:
+    """
+    Get live 3-day / 4-day daily weather forecast with rain probability, max/min temps, and Hindi/English labels.
+    """
+    location_name = resolve_location_name(lat, lon)
+    current_weather = get_weather_data(lat, lon)
+    
+    daily_forecasts: List[Dict[str, Any]] = []
+    
+    try:
+        url = f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,precipitation_sum&timezone=auto"
+        headers = {"User-Agent": "FarmWhisperApp/1.0"}
+        resp = requests.get(url, headers=headers, timeout=5)
+        
+        if resp.status_code == 200:
+            data = resp.json()
+            daily = data.get("daily", {})
+            times = daily.get("time", [])
+            max_temps = daily.get("temperature_2m_max", [])
+            min_temps = daily.get("temperature_2m_min", [])
+            rain_probs = daily.get("precipitation_probability_max", [])
+            precip_sums = daily.get("precipitation_sum", [])
+            wcodes = daily.get("weather_code", [])
+            
+            for i in range(min(days, len(times))):
+                wcode = int(wcodes[i]) if i < len(wcodes) else 0
+                desc_en, desc_hi = WEATHER_CODE_MAP.get(wcode, ("Partly Cloudy", "आंशिक रूप से बादल"))
+                label_hi, label_en = DAY_LABELS[i] if i < len(DAY_LABELS) else (f"{i} दिन बाद", f"In {i} Days")
+                
+                daily_forecasts.append({
+                    "day_index": i,
+                    "date": times[i],
+                    "day_label_hi": label_hi,
+                    "day_label_en": label_en,
+                    "temp_max": round(float(max_temps[i]), 1) if i < len(max_temps) else 30.0,
+                    "temp_min": round(float(min_temps[i]), 1) if i < len(min_temps) else 22.0,
+                    "rain_probability": round(float(rain_probs[i]), 0) if i < len(rain_probs) else 20.0,
+                    "precipitation_mm": round(float(precip_sums[i]), 1) if i < len(precip_sums) else 0.0,
+                    "weather_code": wcode,
+                    "weather_desc_en": desc_en,
+                    "weather_desc_hi": desc_hi
+                })
+    except Exception as e:
+        print(f"Multi-day forecast error: {e}")
+
+    # Fallback if API was unavailable
+    if not daily_forecasts:
+        for i in range(days):
+            label_hi, label_en = DAY_LABELS[i] if i < len(DAY_LABELS) else (f"{i} दिन बाद", f"In {i} Days")
+            daily_forecasts.append({
+                "day_index": i,
+                "date": f"Day +{i}",
+                "day_label_hi": label_hi,
+                "day_label_en": label_en,
+                "temp_max": 32.0 - i,
+                "temp_min": 24.0,
+                "rain_probability": 25.0 + (i * 10),
+                "precipitation_mm": 0.0,
+                "weather_code": 2,
+                "weather_desc_en": "Partly cloudy",
+                "weather_desc_hi": "आंशिक बादल"
+            })
+
+    return {
+        "location": location_name,
+        "current": current_weather.dict() if hasattr(current_weather, 'dict') else current_weather,
+        "daily_forecast": daily_forecasts
+    }
 
 def get_weather_by_location(location: str) -> WeatherResponse:
     """

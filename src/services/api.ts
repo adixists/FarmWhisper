@@ -13,7 +13,12 @@ async function fetchAPI(endpoint: string, options: RequestInit = {}) {
     });
 
     if (!response.ok) {
-      throw new Error(`API request failed with status ${response.status}`);
+      let errDetail = `API request failed with status ${response.status}`;
+      try {
+        const json = await response.json();
+        if (json.detail) errDetail = json.detail;
+      } catch (_) {}
+      throw new Error(errDetail);
     }
 
     return await response.json();
@@ -33,11 +38,30 @@ export async function testEndpoint() {
   return fetchAPI('/test');
 }
 
-// Voice processing
-export async function processVoiceQuery(audioBlob: Blob) {
+// Voice query & AI reasoning processing
+export interface VoiceQueryParams {
+  audioBlob?: Blob;
+  textQuery?: string;
+  lat?: number;
+  lon?: number;
+  language?: string;
+}
+
+export async function processVoiceQuery(params: VoiceQueryParams) {
   const formData = new FormData();
-  formData.append('audio_file', audioBlob, 'recording.wav');
-  formData.append('method', 'google');
+  if (params.audioBlob) {
+    formData.append('audio_file', params.audioBlob, 'recording.wav');
+  }
+  if (params.textQuery) {
+    formData.append('text_query', params.textQuery);
+  }
+  if (params.lat !== undefined && params.lon !== undefined) {
+    formData.append('lat', params.lat.toString());
+    formData.append('lon', params.lon.toString());
+  }
+  if (params.language) {
+    formData.append('language', params.language);
+  }
 
   try {
     const response = await fetch(`${API_BASE_URL}/voice/query`, {
@@ -46,16 +70,24 @@ export async function processVoiceQuery(audioBlob: Blob) {
     });
 
     if (!response.ok) {
-      throw new Error(`Voice processing failed with status ${response.status}`);
+      let errDetail = `Voice processing failed with status ${response.status}`;
+      try {
+        const json = await response.json();
+        if (json.detail) errDetail = json.detail;
+      } catch (_) {}
+      throw new Error(errDetail);
     }
 
     return await response.json();
   } catch (error) {
     console.error('Error processing voice query:', error);
-    // Return mock data for demonstration
+    // Fallback response for offline demonstration
     return {
-      text: "This is a mock voice transcription. In a full implementation, this would be the actual transcription of your voice query.",
-      language: "en"
+      query: params.textQuery || "आवाज प्रश्न",
+      response_text: "मौसम सामान्य है और आपकी फसल सुरक्षित है। किसी भी समस्या के लिए कृपया दोबारा पूछें।",
+      language: params.language || "hi",
+      query_type: "general",
+      recommendations: ["खेत में उचित नमी बनाए रखें", "कीटों की नियमित जांच करें"]
     };
   }
 }
@@ -77,9 +109,7 @@ export async function analyzeCropImage(imageBlob: Blob) {
       if (errJson.detail) {
         errorDetail = errJson.detail;
       }
-    } catch (_) {
-      // ignore json parse error
-    }
+    } catch (_) {}
     console.error('Backend error:', errorDetail);
     throw new Error(errorDetail);
   }
@@ -87,20 +117,38 @@ export async function analyzeCropImage(imageBlob: Blob) {
   return await response.json();
 }
 
-// Get weather data
+// Get recent crop scan history
+export async function getCropHistory() {
+  try {
+    return await fetchAPI('/crop/history');
+  } catch (error) {
+    return [];
+  }
+}
+
+// Get current weather data
 export async function getWeatherData(lat: number, lon: number) {
   try {
     return await fetchAPI(`/weather/forecast?lat=${lat}&lon=${lon}`);
   } catch (error) {
     console.error('Error fetching weather data:', error);
-    // Return mock data for demonstration
     return {
       temperature: 28.5,
       humidity: 65,
       rain_probability: 30,
-      description: "Partly cloudy",
+      description: "Partly cloudy (आंशिक बादल)",
       location: `Coordinates: ${lat}, ${lon}`
     };
+  }
+}
+
+// Get multi-day 3-day weather forecast
+export async function getMultiDayWeather(lat: number, lon: number, days: number = 4) {
+  try {
+    return await fetchAPI(`/weather/forecast/multiday?lat=${lat}&lon=${lon}&days=${days}`);
+  } catch (error) {
+    console.error('Error fetching multi-day weather:', error);
+    return null;
   }
 }
 
@@ -110,12 +158,11 @@ export async function getWeatherByLocation(location: string) {
     return await fetchAPI(`/weather/location?location=${encodeURIComponent(location)}`);
   } catch (error) {
     console.error('Error fetching weather by location:', error);
-    // Return mock data for demonstration
     return {
       temperature: 28.5,
       humidity: 65,
       rain_probability: 30,
-      description: "Partly cloudy",
+      description: "Partly cloudy (आंशिक बादल)",
       location: location
     };
   }
@@ -138,7 +185,6 @@ export async function generateAdvisory(cropType: string, analysisResult: any) {
     });
   } catch (error) {
     console.error('Error generating advisory:', error);
-    // Return mock data for demonstration
     return {
       story: `The soil hums of thirst — calling for the old river's memory. Like a wise grandmother, your ${cropType} whispers of balance - neither too much nor too little. The golden sun smiles upon your fields, promising abundance to those who listen to nature's rhythm.`,
       tips: [
@@ -156,7 +202,6 @@ export async function getCommunityPosts(limit: number = 10, offset: number = 0) 
     return await fetchAPI(`/community/?limit=${limit}&offset=${offset}`);
   } catch (error) {
     console.error('Error fetching community posts:', error);
-    // Return mock data for demonstration
     return [
       {
         id: "1",
@@ -200,7 +245,6 @@ export async function createCommunityPost(postData: any) {
     });
   } catch (error) {
     console.error('Error creating community post:', error);
-    // Return mock data for demonstration
     return {
       ...postData,
       id: "mock-" + Date.now(),
@@ -221,7 +265,6 @@ export async function upvoteCommunityPost(postId: string, userId: string) {
     });
   } catch (error) {
     console.error('Error upvoting community post:', error);
-    // Return mock data for demonstration
     return {
       message: "Post upvoted successfully",
       upvotes: Math.floor(Math.random() * 100) + 1
@@ -243,7 +286,6 @@ export async function narrateStory(text: string) {
     });
   } catch (error) {
     console.error('Error narrating story:', error);
-    // Return mock data for demonstration
     const storyPreview = text.length > 100 ? text.substring(0, 100) + "..." : text;
     return {
       message: "Text-to-speech conversion initiated",

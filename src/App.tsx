@@ -46,7 +46,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-amber-50 to-green-50">
+    <div className="min-h-screen bg-slate-50">
       {/* Backend Status Indicator */}
       {backendStatus === 'checking' && (
         <div className="bg-blue-500 text-white text-center py-2 text-sm">
@@ -61,63 +61,113 @@ export default function App() {
       )}
       
       {/* Mobile App Container */}
-      <div className="max-w-md mx-auto h-screen flex flex-col bg-white shadow-2xl">
+      <div className="max-w-md mx-auto h-screen flex flex-col bg-white shadow-2xl overflow-hidden relative">
         {/* Screen Content */}
         <div className="flex-1 overflow-y-auto">
           {renderScreen()}
         </div>
 
-        {/* Bottom Navigation */}
-        <nav className="bg-gradient-to-r from-green-700 to-green-800 border-t border-green-900 pb-safe">
-          <div className="flex justify-around items-center h-16">
+        {/* Bottom Navigation - Dark forest green as per design */}
+        <nav style={{ background: '#1B4332' }} className="pb-safe relative z-50 shadow-[0_-4px_20px_rgba(0,0,0,0.15)]">
+          <div className="flex justify-around items-center h-16 px-2">
             <button
               onClick={() => setActiveScreen('home')}
-              className={`flex flex-col items-center justify-center px-4 py-2 rounded-lg transition-colors ${
-                activeScreen === 'home' ? 'text-amber-300' : 'text-green-100'
-              }`}
+              className="flex flex-col items-center justify-center w-16 h-full transition-all duration-200"
             >
-              <Home className="w-6 h-6 mb-1" />
-              <span className="text-xs">होम</span>
+              <Home
+                className="w-5 h-5 mb-1"
+                style={{
+                  color: activeScreen === 'home' ? '#ffffff' : 'rgba(255,255,255,0.55)',
+                  fill: activeScreen === 'home' ? 'rgba(255,255,255,0.2)' : 'none',
+                  strokeWidth: activeScreen === 'home' ? 2.5 : 1.5,
+                  transform: activeScreen === 'home' ? 'scale(1.15)' : 'scale(1)',
+                  transition: 'all 0.2s',
+                }}
+              />
+              <span
+                className="text-[10px] font-bold"
+                style={{ color: activeScreen === 'home' ? '#ffffff' : 'rgba(255,255,255,0.55)' }}
+              >होम</span>
             </button>
-            
+
             <button
               onClick={() => setActiveScreen('image')}
-              className={`flex flex-col items-center justify-center px-4 py-2 rounded-lg transition-colors ${
-                activeScreen === 'image' ? 'text-amber-300' : 'text-green-100'
-              }`}
+              className="flex flex-col items-center justify-center w-16 h-full transition-all duration-200"
             >
-              <Camera className="w-6 h-6 mb-1" />
-              <span className="text-xs">फोटो</span>
+              <Camera
+                className="w-5 h-5 mb-1"
+                style={{
+                  color: activeScreen === 'image' ? '#ffffff' : 'rgba(255,255,255,0.55)',
+                  fill: activeScreen === 'image' ? 'rgba(255,255,255,0.2)' : 'none',
+                  strokeWidth: activeScreen === 'image' ? 2.5 : 1.5,
+                  transform: activeScreen === 'image' ? 'scale(1.15)' : 'scale(1)',
+                  transition: 'all 0.2s',
+                }}
+              />
+              <span
+                className="text-[10px] font-bold"
+                style={{ color: activeScreen === 'image' ? '#ffffff' : 'rgba(255,255,255,0.55)' }}
+              >फोटो</span>
             </button>
-            
+
             <button
               onClick={() => setActiveScreen('story')}
-              className={`flex flex-col items-center justify-center px-4 py-2 rounded-lg transition-colors ${
-                activeScreen === 'story' ? 'text-amber-300' : 'text-green-100'
-              }`}
+              className="flex flex-col items-center justify-center w-16 h-full transition-all duration-200"
             >
-              <BookOpen className="w-6 h-6 mb-1" />
-              <span className="text-xs">सलाह</span>
+              <BookOpen
+                className="w-5 h-5 mb-1"
+                style={{
+                  color: activeScreen === 'story' ? '#ffffff' : 'rgba(255,255,255,0.55)',
+                  fill: activeScreen === 'story' ? 'rgba(255,255,255,0.2)' : 'none',
+                  strokeWidth: activeScreen === 'story' ? 2.5 : 1.5,
+                  transform: activeScreen === 'story' ? 'scale(1.15)' : 'scale(1)',
+                  transition: 'all 0.2s',
+                }}
+              />
+              <span
+                className="text-[10px] font-bold"
+                style={{ color: activeScreen === 'story' ? '#ffffff' : 'rgba(255,255,255,0.55)' }}
+              >सलाह</span>
             </button>
-            
+
             <button
               onClick={() => setActiveScreen('community')}
-              className={`flex flex-col items-center justify-center px-4 py-2 rounded-lg transition-colors ${
-                activeScreen === 'community' ? 'text-amber-300' : 'text-green-100'
-              }`}
+              className="flex flex-col items-center justify-center w-16 h-full transition-all duration-200"
             >
-              <Users className="w-6 h-6 mb-1" />
-              <span className="text-xs">समुदाय</span>
+              <Users
+                className="w-5 h-5 mb-1"
+                style={{
+                  color: activeScreen === 'community' ? '#ffffff' : 'rgba(255,255,255,0.55)',
+                  fill: activeScreen === 'community' ? 'rgba(255,255,255,0.2)' : 'none',
+                  strokeWidth: activeScreen === 'community' ? 2.5 : 1.5,
+                  transform: activeScreen === 'community' ? 'scale(1.15)' : 'scale(1)',
+                  transition: 'all 0.2s',
+                }}
+              />
+              <span
+                className="text-[10px] font-bold"
+                style={{ color: activeScreen === 'community' ? '#ffffff' : 'rgba(255,255,255,0.55)' }}
+              >समुदाय</span>
             </button>
-            
+
             <button
               onClick={() => setActiveScreen('analytics')}
-              className={`flex flex-col items-center justify-center px-4 py-2 rounded-lg transition-colors ${
-                activeScreen === 'analytics' ? 'text-amber-300' : 'text-green-100'
-              }`}
+              className="flex flex-col items-center justify-center w-16 h-full transition-all duration-200"
             >
-              <BarChart3 className="w-6 h-6 mb-1" />
-              <span className="text-xs">आंकड़े</span>
+              <BarChart3
+                className="w-5 h-5 mb-1"
+                style={{
+                  color: activeScreen === 'analytics' ? '#ffffff' : 'rgba(255,255,255,0.55)',
+                  fill: activeScreen === 'analytics' ? 'rgba(255,255,255,0.2)' : 'none',
+                  strokeWidth: activeScreen === 'analytics' ? 2.5 : 1.5,
+                  transform: activeScreen === 'analytics' ? 'scale(1.15)' : 'scale(1)',
+                  transition: 'all 0.2s',
+                }}
+              />
+              <span
+                className="text-[10px] font-bold"
+                style={{ color: activeScreen === 'analytics' ? '#ffffff' : 'rgba(255,255,255,0.55)' }}
+              >आंकड़े</span>
             </button>
           </div>
         </nav>

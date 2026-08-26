@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Mic, Cloud, Droplets, Thermometer, Leaf, Sun, Volume2, VolumeX, Pause, Play, Sparkles, X } from 'lucide-react';
+import { Mic, Cloud, Droplets, Thermometer, Leaf, Wind, Volume2, Pause, Sparkles, X, CloudRain } from 'lucide-react';
 import { healthCheck, getWeatherData, getWeatherByLocation, processVoiceQuery } from '../services/api';
+import { LeavesBackground } from './LeavesBackground';
 
 export function VoiceHomeScreen() {
   const [isListening, setIsListening] = useState(false);
@@ -215,193 +216,196 @@ export function VoiceHomeScreen() {
   };
 
   return (
-    <div className="min-h-full bg-gradient-to-br from-green-50 via-amber-50 to-green-100 p-6 pb-24">
-      {/* Header */}
-      <div className="text-center mb-8 pt-4">
-        <div className="flex items-center justify-center gap-2 mb-2">
-          <Leaf className="w-8 h-8 text-green-700" />
-          <span className="text-green-800 text-2xl">🌾</span>
-        </div>
-        <h1 className="text-green-900 mb-1 font-bold text-2xl">FarmWhisper</h1>
-        <p className="text-green-700 text-sm font-medium">खेती का सच्चा साथी</p>
-      </div>
+    <div className="min-h-full relative overflow-hidden flex flex-col p-6 pb-24">
+      {/* Live Wallpaper Background */}
+      <LeavesBackground />
 
-      {/* Status messages */}
-      {loading && (
-        <div className="text-center mb-4 text-green-700 text-sm">
-          मौसम जानकारी लोड हो रही है...
+      {/* Main Content Container (z-10 to stay above background) */}
+      <div className="relative z-10 flex flex-col h-full">
+        {/* Header */}
+        <div className="text-center mb-8 pt-6">
+          <div className="flex items-center justify-center gap-2 mb-3">
+            <div className="bg-green-600/10 p-2.5 rounded-2xl">
+              <Leaf className="w-7 h-7 text-green-600 fill-green-600" />
+            </div>
+          </div>
+          <h1 className="text-green-950 mb-1 font-black text-3xl tracking-tight leading-none">FarmWhisper</h1>
+          <div className="flex items-center justify-center gap-1.5 mt-2">
+            <span className="bg-green-100 text-green-700 text-xs font-bold px-3 py-1 rounded-full border border-green-200/60">
+              🌱 खेती का सच्चा साथी
+            </span>
+          </div>
         </div>
-      )}
-      
-      {error && (
-        <div className="text-center mb-4 text-red-500 bg-red-50 p-2 rounded-xl text-sm border border-red-200">
-          {error}
-        </div>
-      )}
 
-      {/* Voice Assistant Button */}
-      <div className="flex flex-col items-center mb-8">
-        <motion.button
-          onClick={toggleListening}
-          className={`relative w-40 h-40 rounded-full shadow-2xl flex items-center justify-center transition-all ${
-            isListening 
-              ? 'bg-gradient-to-br from-red-500 to-red-700' 
-              : isProcessing
-              ? 'bg-gradient-to-br from-amber-500 to-amber-700'
-              : 'bg-gradient-to-br from-green-600 to-green-800'
-          }`}
-          whileTap={{ scale: 0.95 }}
-          animate={isListening ? { scale: [1, 1.05, 1] } : {}}
-          transition={{ repeat: isListening ? Infinity : 0, duration: 1.5 }}
-        >
-          <Mic className="w-16 h-16 text-white" />
-          
-          {/* Animated Waves */}
-          {isListening && (
-            <>
-              <motion.div
-                className="absolute w-40 h-40 rounded-full border-4 border-green-400 opacity-30 pointer-events-none"
-                animate={{ scale: [1, 1.5, 1.5], opacity: [0.3, 0, 0] }}
-                transition={{ repeat: Infinity, duration: 2 }}
-              />
-              <motion.div
-                className="absolute w-40 h-40 rounded-full border-4 border-amber-400 opacity-30 pointer-events-none"
-                animate={{ scale: [1, 1.5, 1.5], opacity: [0.3, 0, 0] }}
-                transition={{ repeat: Infinity, duration: 2, delay: 0.5 }}
-              />
-              <motion.div
-                className="absolute w-40 h-40 rounded-full border-4 border-green-300 opacity-30 pointer-events-none"
-                animate={{ scale: [1, 1.5, 1.5], opacity: [0.3, 0, 0] }}
-                transition={{ repeat: Infinity, duration: 2, delay: 1 }}
-              />
-            </>
-          )}
-        </motion.button>
-        
-        <p className="mt-4 text-green-900 font-bold text-base">
-          {isListening ? '🎤 सुन रहा हूँ... बोलिए' : isProcessing ? '✨ AI सोच रहा है...' : 'पूछें FarmWhisper से'}
-        </p>
-
-        {isListening && voiceQueryText && (
-          <p className="text-xs text-green-800 mt-1.5 bg-green-100/80 px-3 py-1 rounded-full font-medium animate-pulse">
-            "{voiceQueryText}"
-          </p>
+        {/* Status messages */}
+        {loading && (
+          <div className="text-center mb-4 text-green-700 text-sm font-medium">
+            मौसम जानकारी लोड हो रही है...
+          </div>
         )}
-      </div>
+        
+        {error && (
+          <div className="text-center mb-4 text-red-500 bg-red-50 p-3 rounded-2xl text-sm font-medium border border-red-100 shadow-sm">
+            {error}
+          </div>
+        )}
 
-      {/* Voice Response Card (Appears cleanly when answer is received) */}
-      <AnimatePresence>
-        {voiceResponse && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            className="bg-white rounded-3xl p-5 mb-6 shadow-xl border-2 border-green-300 relative"
+        {/* Voice Assistant Button Area */}
+        <div className="flex-1 flex flex-col items-center justify-center mb-10">
+          <motion.button
+            onClick={toggleListening}
+            className="relative w-44 h-44 rounded-full flex items-center justify-center transition-all group"
+            style={{
+              background: isListening
+                ? 'linear-gradient(145deg, #ef4444 0%, #b91c1c 100%)'
+                : isProcessing
+                ? 'linear-gradient(145deg, #f59e0b 0%, #b45309 100%)'
+                : 'linear-gradient(145deg, #2D6A4F 0%, #1B4332 100%)',
+              boxShadow: isListening
+                ? '0 8px 32px rgba(185,28,28,0.45), 0 2px 8px rgba(0,0,0,0.2)'
+                : isProcessing
+                ? '0 8px 32px rgba(180,83,9,0.45), 0 2px 8px rgba(0,0,0,0.2)'
+                : '0 8px 32px rgba(27,67,50,0.5), 0 2px 8px rgba(0,0,0,0.2)',
+            }}
+            whileHover={{ scale: 1.04 }}
+            whileTap={{ scale: 0.93 }}
+            animate={isListening ? { scale: [1, 1.05, 1] } : {}}
+            transition={{ repeat: isListening ? Infinity : 0, duration: 1.5 }}
           >
-            <button
-              onClick={() => setVoiceResponse(null)}
-              className="absolute top-3 right-3 text-gray-400 hover:text-gray-700 p-1"
-            >
-              <X className="w-4 h-4" />
-            </button>
+            {/* Concentric rings for aesthetics */}
+            <div className="absolute inset-0 rounded-full border-2 border-white/15 scale-110"></div>
+            <div className="absolute inset-2 rounded-full border border-white/40 group-hover:border-white/60 transition-colors"></div>
+            <div className="absolute inset-5 rounded-full border border-white/25"></div>
+            <div className="absolute inset-9 rounded-full border border-white/15"></div>
+            
+            <Mic className="w-20 h-20 text-white drop-shadow-md z-10" />
+            
+            {/* Animated Waves */}
+            {isListening && (
+              <>
+                <motion.div
+                  className="absolute w-48 h-48 rounded-full border-4 border-white opacity-40 pointer-events-none"
+                  animate={{ scale: [1, 1.6, 1.6], opacity: [0.4, 0, 0] }}
+                  transition={{ repeat: Infinity, duration: 2 }}
+                />
+                <motion.div
+                  className="absolute w-48 h-48 rounded-full border-4 border-white opacity-40 pointer-events-none"
+                  animate={{ scale: [1, 1.6, 1.6], opacity: [0.4, 0, 0] }}
+                  transition={{ repeat: Infinity, duration: 2, delay: 0.6 }}
+                />
+              </>
+            )}
+          </motion.button>
+          
+          <p className="mt-8 text-green-950 font-black text-lg tracking-wide drop-shadow-sm">
+            {isListening ? 'सुन रहा हूँ... बोलिए' : isProcessing ? 'AI सोच रहा है...' : 'पूछें FarmWhisper से'}
+          </p>
 
-            <div className="flex items-center gap-2 mb-2">
-              <Sparkles className="w-5 h-5 text-amber-500" />
-              <h3 className="font-bold text-green-950 text-sm">FarmWhisper उत्तर:</h3>
-            </div>
-
-            <p className="text-sm text-green-950 font-medium leading-relaxed mb-3">
-              {voiceResponse.response_text}
+          {isListening && voiceQueryText && (
+            <p className="text-sm text-green-800 mt-3 bg-white/60 backdrop-blur-md px-4 py-2 rounded-full font-medium shadow-sm border border-white/50">
+              "{voiceQueryText}"
             </p>
+          )}
+        </div>
 
-            <div className="flex items-center justify-between pt-2 border-t border-gray-100">
-              <button
-                onClick={isSpeaking ? stopSpeaking : () => speakResponse(voiceResponse.response_text)}
-                className="flex items-center gap-1.5 text-xs font-bold text-green-800 bg-green-100 hover:bg-green-200 px-3 py-1.5 rounded-xl transition-colors"
-              >
-                {isSpeaking ? <Pause className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}
-                <span>{isSpeaking ? 'आवाज़ रोकें' : 'दोबारा सुनें'}</span>
-              </button>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Whispering Leaves Animation */}
-      {!voiceResponse && (
-        <div className="flex justify-center gap-2 mb-8">
-          {[0, 0.2, 0.4].map((delay, i) => (
+        {/* Voice Response Card (Appears cleanly when answer is received) */}
+        <AnimatePresence>
+          {voiceResponse && (
             <motion.div
-              key={i}
-              animate={{ rotate: [-10, 10, -10], y: [0, -5, 0] }}
-              transition={{ repeat: Infinity, duration: 2, delay }}
+              initial={{ opacity: 0, y: 20, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 20, scale: 0.95 }}
+              className="bg-white/95 backdrop-blur-xl rounded-3xl p-6 mb-8 shadow-2xl border border-white relative z-20"
             >
-              <Leaf className="w-6 h-6 text-green-600" />
+              <button
+                onClick={() => setVoiceResponse(null)}
+                className="absolute top-4 right-4 text-slate-400 hover:text-slate-700 bg-slate-50 hover:bg-slate-100 rounded-full p-1.5 transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
+
+              <div className="flex items-center gap-2.5 mb-3">
+                <div className="bg-amber-100 p-1.5 rounded-xl">
+                  <Sparkles className="w-5 h-5 text-amber-500" />
+                </div>
+                <h3 className="font-bold text-green-950 text-base">FarmWhisper उत्तर:</h3>
+              </div>
+
+              <p className="text-sm text-slate-700 font-medium leading-relaxed mb-4">
+                {voiceResponse.response_text}
+              </p>
+
+              <div className="flex items-center justify-between pt-3 border-t border-slate-100">
+                <button
+                  onClick={isSpeaking ? stopSpeaking : () => speakResponse(voiceResponse.response_text)}
+                  className="flex items-center gap-2 text-xs font-bold text-green-700 bg-green-50 hover:bg-green-100 px-4 py-2 rounded-xl transition-colors"
+                >
+                  {isSpeaking ? <Pause className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+                  <span>{isSpeaking ? 'आवाज़ रोकें' : 'दोबारा सुनें'}</span>
+                </button>
+              </div>
             </motion.div>
-          ))}
-        </div>
-      )}
+          )}
+        </AnimatePresence>
 
-      {/* Weather Card */}
-      <div className="bg-white rounded-3xl shadow-lg p-6 mb-4 border-2 border-amber-200">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h3 className="text-green-900 font-bold text-lg">आज का मौसम</h3>
-            <p className="text-xs text-green-700 font-medium">
-              {weatherData?.location || 'स्थानीय मौसम'}
-            </p>
-          </div>
-          <Cloud className="w-6 h-6 text-blue-500" />
-        </div>
-        
-        {weatherData ? (
-          <div className="grid grid-cols-3 gap-4">
-            <div className="text-center bg-blue-50 rounded-2xl p-3 border border-blue-100">
-              <Droplets className="w-6 h-6 text-blue-600 mx-auto mb-2" />
-              <p className="text-blue-900 text-xs mb-1 font-semibold">बारिश</p>
-              <p className="text-blue-900 font-bold text-lg">{Math.round(weatherData.rain_probability || 0)}%</p>
+        {/* Weather Card */}
+        <div className="bg-[#F8F9FA]/90 backdrop-blur-md rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-6 border border-white">
+          <div className="flex items-center justify-between mb-5">
+            <div>
+              <h3 className="text-slate-800 font-black text-lg">आज का मौसम</h3>
+              <p className="text-xs text-slate-500 font-semibold mt-0.5 flex items-center gap-1">
+                📍 {weatherData?.location || 'स्थानीय मौसम'}
+              </p>
             </div>
-            
-            <div className="text-center bg-orange-50 rounded-2xl p-3 border border-orange-100">
-              <Thermometer className="w-6 h-6 text-orange-600 mx-auto mb-2" />
-              <p className="text-orange-900 text-xs mb-1 font-semibold">तापमान</p>
-              <p className="text-orange-900 font-bold text-lg">{Math.round(weatherData.temperature || 0)}°C</p>
+            <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm">
+              <Cloud className="w-5 h-5 text-blue-500 fill-blue-100" />
             </div>
-            
-            <div className="text-center bg-yellow-50 rounded-2xl p-3 border border-yellow-100">
-              <Sun className="w-6 h-6 text-yellow-600 mx-auto mb-2" />
-              <p className="text-yellow-900 text-xs mb-1 font-semibold">आर्द्रता</p>
-              <p className="text-yellow-900 font-bold text-lg">{Math.round(weatherData.humidity || 0)}%</p>
-            </div>
-          </div>
-        ) : (
-          <div className="text-center text-green-700 py-4 text-sm font-medium">
-            मौसम डेटा लोड हो रहा है...
-          </div>
-        )}
-      </div>
-
-      {/* Crop Health Summary */}
-      <div className="bg-gradient-to-br from-green-600 to-green-700 rounded-3xl shadow-lg p-6 text-white border-2 border-green-800">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="font-bold text-lg">आज की फसल रिपोर्ट</h3>
-          <span className="text-3xl">🌾</span>
-        </div>
-        
-        <div className="space-y-3">
-          <div className="flex justify-between items-center bg-white/10 rounded-xl p-3 backdrop-blur">
-            <span className="font-medium">धान - स्वस्थ</span>
-            <span className="text-2xl">✅</span>
           </div>
           
-          <div className="flex justify-between items-center bg-amber-500/20 rounded-xl p-3 backdrop-blur">
-            <span className="font-medium">गेहूं - सिंचाई चाहिए</span>
-            <span className="text-2xl">💧</span>
-          </div>
-          
-          <div className="flex justify-between items-center bg-white/10 rounded-xl p-3 backdrop-blur">
-            <span className="font-medium">मिट्टी की नमी - अच्छी</span>
-            <span className="text-2xl">🟢</span>
+          {weatherData ? (
+            <div className="grid grid-cols-3 gap-3 mb-5">
+              {/* Rain - Blue tinted tile */}
+              <div
+                className="flex flex-col items-center rounded-2xl p-3.5 border border-blue-100"
+                style={{ background: 'linear-gradient(145deg, #dbeafe 0%, #bfdbfe 100%)' }}
+              >
+                <CloudRain className="w-5 h-5 text-blue-600 mb-1.5" />
+                <p className="text-blue-700 text-[10px] font-bold uppercase tracking-wider mb-0.5">बारिश</p>
+                <p className="text-blue-900 font-black text-lg leading-none">{Math.round(weatherData.rain_probability || 0)}%</p>
+              </div>
+
+              {/* Temperature - Warm red/orange tile */}
+              <div
+                className="flex flex-col items-center rounded-2xl p-3.5 border border-orange-100"
+                style={{ background: 'linear-gradient(145deg, #fed7aa 0%, #fdba74 100%)' }}
+              >
+                <Thermometer className="w-5 h-5 text-orange-700 mb-1.5" />
+                <p className="text-orange-700 text-[10px] font-bold uppercase tracking-wider mb-0.5">तापमान</p>
+                <p className="text-orange-900 font-black text-lg leading-none">{Math.round(weatherData.temperature || 0)}°C</p>
+              </div>
+
+              {/* Humidity - Golden/amber tile */}
+              <div
+                className="flex flex-col items-center rounded-2xl p-3.5 border border-yellow-100"
+                style={{ background: 'linear-gradient(145deg, #fef9c3 0%, #fde68a 100%)' }}
+              >
+                <Wind className="w-5 h-5 text-yellow-700 mb-1.5" />
+                <p className="text-yellow-700 text-[10px] font-bold uppercase tracking-wider mb-0.5">आर्द्रता</p>
+                <p className="text-yellow-900 font-black text-lg leading-none">{Math.round(weatherData.humidity || 0)}%</p>
+              </div>
+            </div>
+          ) : (
+            <div className="text-center text-slate-500 py-6 text-sm font-medium">
+              मौसम डेटा लोड हो रहा है...
+            </div>
+          )}
+
+          {/* Toggle for Crop Reports */}
+          <div className="pt-4 border-t border-slate-200/60 flex items-center justify-between">
+            <span className="text-sm font-bold text-slate-700">Current Crop Reports</span>
+            <div className="w-12 h-6 bg-green-500 rounded-full relative shadow-inner cursor-pointer flex items-center px-1">
+              <motion.div className="w-4 h-4 bg-white rounded-full shadow-sm" layout transition={{ type: "spring", stiffness: 700, damping: 30 }} />
+            </div>
           </div>
         </div>
       </div>

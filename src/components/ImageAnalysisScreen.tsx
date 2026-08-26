@@ -1,6 +1,7 @@
 import { useState, useRef, ChangeEvent, useEffect } from 'react';
 import { Camera, Upload, AlertTriangle, Droplets, Bug, Leaf, X, Scan, FlaskConical, Sparkles, ArrowLeft, RefreshCw, CheckCircle2, ShieldAlert } from 'lucide-react';
 import { analyzeCropImage } from '../services/api';
+import { motion } from 'motion/react';
 
 // Ultra-fast client-side image downscaling & compression (reduces 10MB camera photo to ~150KB in 15ms)
 function compressImage(file: File, maxDim: number = 1024, quality: number = 0.82): Promise<{ blob: Blob; dataUrl: string }> {
@@ -182,8 +183,8 @@ export function ImageAnalysisScreen() {
             className="min-w-full min-h-full object-cover"
           />
           {/* Viewfinder Target Brackets */}
-          <div className="absolute inset-16 border-2 border-dashed border-emerald-400/80 rounded-3xl pointer-events-none flex items-center justify-center">
-            <Scan className="w-16 h-16 text-emerald-400/50 animate-pulse" />
+          <div className="absolute inset-16 border-2 border-dashed border-[#16a34a]/80 rounded-3xl pointer-events-none flex items-center justify-center">
+            <Scan className="w-16 h-16 text-[#16a34a]/50 animate-pulse" />
           </div>
         </div>
 
@@ -191,7 +192,7 @@ export function ImageAnalysisScreen() {
         <div className="p-8 flex justify-center items-center z-10 bg-gradient-to-t from-black/90 via-black/50 to-transparent pb-12">
           <button 
             onClick={capturePhoto}
-            className="w-20 h-20 bg-white rounded-full border-4 border-emerald-500 shadow-2xl flex items-center justify-center active:scale-90 transition-transform ring-4 ring-white/30"
+            className="w-20 h-20 bg-white rounded-full border-4 border-[#16a34a] shadow-2xl flex items-center justify-center active:scale-90 transition-transform ring-4 ring-white/30"
           >
             <div className="w-16 h-16 bg-white rounded-full border border-gray-300"></div>
           </button>
@@ -201,7 +202,7 @@ export function ImageAnalysisScreen() {
   }
 
   return (
-    <div className="min-h-full bg-gradient-to-br from-emerald-50/70 via-amber-50/40 to-green-100/60 p-5 pb-24">
+    <div className="min-h-full bg-[#F8F9FA] p-5 pb-24 relative overflow-x-hidden">
       <input
         type="file"
         ref={fileInputRef}
@@ -211,14 +212,17 @@ export function ImageAnalysisScreen() {
       />
 
       {/* Screen Header */}
-      <div className="flex items-center justify-between pt-2 mb-4">
-        <div className="flex items-center gap-2">
-          <div className="w-10 h-10 rounded-2xl bg-emerald-700 flex items-center justify-center text-white shadow-md">
-            <Sparkles className="w-6 h-6" />
+      <div className="pt-3 pb-4 mb-2">
+        <div className="flex items-center gap-2.5 mb-1">
+          <div
+            className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+            style={{ background: 'linear-gradient(145deg, #2D6A4F 0%, #1B4332 100%)' }}
+          >
+            <Leaf className="w-5 h-5 text-white" />
           </div>
           <div>
-            <h1 className="text-emerald-950 font-black text-xl leading-tight">AI फसल डॉक्टर</h1>
-            <p className="text-emerald-700 text-xs font-semibold">फोटो से तुरंत बीमारी व खाद की पहचान</p>
+            <h1 className="text-slate-900 font-black text-xl leading-tight">AI फसल डॉक्टर</h1>
+            <p className="text-green-700 text-xs font-semibold">फोटो से तुरंत बीमारी व खाद की पहचान</p>
           </div>
         </div>
       </div>
@@ -239,61 +243,87 @@ export function ImageAnalysisScreen() {
 
       {/* Photo Capture & Upload Area */}
       {!imageUploaded ? (
-        <div className="bg-white/95 rounded-3xl p-6 shadow-xl border border-emerald-100 mb-5">
-          <p className="text-xs font-bold text-emerald-950 mb-4 text-center">
-            फोटो खींचें या गैलरी से चुनें (Select Option)
-          </p>
-
-          <div className="grid grid-cols-2 gap-3.5">
-            {/* Camera Option */}
-            <button
+        <div className="mb-5">
+          <p className="text-xs font-semibold text-slate-500 mb-3 text-center">फोटो खींचें या गैलरी से चुनें (Select Option)</p>
+          <div className="grid grid-cols-2 gap-3">
+            {/* Camera Option — neutral/unselected look */}
+            <motion.button
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.94 }}
               onClick={openCamera}
-              className="flex flex-col items-center justify-center p-5 rounded-2xl bg-gradient-to-br from-emerald-600 to-emerald-800 text-white shadow-lg active:scale-95 transition-all hover:brightness-105"
+              className="flex flex-col items-center justify-center py-8 rounded-2xl border transition-all relative overflow-hidden"
+              style={{ background: '#f1f5f9', borderColor: '#e2e8f0' }}
             >
-              <div className="w-12 h-12 rounded-2xl bg-white/20 flex items-center justify-center mb-2.5">
-                <Camera className="w-6 h-6 text-white" />
+              <div
+                className="w-14 h-14 rounded-2xl flex items-center justify-center mb-3"
+                style={{ background: '#e2e8f0' }}
+              >
+                <Camera className="w-7 h-7" style={{ color: '#64748b' }} />
               </div>
-              <span className="font-bold text-sm">कैमरा</span>
-              <span className="text-[10px] text-emerald-100 font-medium">Take Photo</span>
-            </button>
+              <span className="font-bold text-sm text-slate-700">फोटो खींचें</span>
+              <span className="text-[10px] font-medium text-slate-400 mt-0.5">Take a Photo</span>
+            </motion.button>
 
-            {/* Gallery Option */}
-            <button
+            {/* Gallery Option — amber/gold highlighted (active) */}
+            <motion.button
+              whileHover={{ scale: 1.03, boxShadow: '0 12px 40px -8px rgba(180,83,9,0.4)' }}
+              whileTap={{ scale: 0.94 }}
               onClick={() => fileInputRef.current?.click()}
-              className="flex flex-col items-center justify-center p-5 rounded-2xl bg-gradient-to-br from-amber-500 to-amber-600 text-white shadow-lg active:scale-95 transition-all hover:brightness-105"
+              className="flex flex-col items-center justify-center py-8 rounded-2xl border transition-all relative overflow-hidden"
+              style={{
+                background: 'linear-gradient(145deg, #f59e0b 0%, #d97706 100%)',
+                borderColor: '#b45309',
+                boxShadow: '0 8px 24px -4px rgba(180,83,9,0.35)',
+              }}
             >
-              <div className="w-12 h-12 rounded-2xl bg-white/20 flex items-center justify-center mb-2.5">
-                <Upload className="w-6 h-6 text-white" />
+              <div
+                className="w-14 h-14 rounded-2xl flex items-center justify-center mb-3"
+                style={{ background: 'rgba(255,255,255,0.25)' }}
+              >
+                <Upload className="w-7 h-7 text-white" />
               </div>
-              <span className="font-bold text-sm">गैलरी</span>
-              <span className="text-[10px] text-amber-100 font-medium">Upload File</span>
-            </button>
+              <span className="font-bold text-sm text-white">गैलरी से चुनें</span>
+              <span className="text-[10px] font-medium text-amber-100 mt-0.5">Select from Gallery</span>
+            </motion.button>
           </div>
 
-          <p className="text-center text-emerald-800/80 text-[11px] mt-4 font-medium">
-            💡 टिप: पत्ती या रोगग्रस्त हिस्से की साफ़ और नज़दीक से फोटो लें।
-          </p>
+          {/* Tip card with bulb icon */}
+          <div className="bg-white rounded-2xl p-4 mt-4 border border-slate-100 shadow-sm flex items-start gap-3">
+            <span className="text-xl flex-shrink-0 mt-0.5">💡</span>
+            <p className="text-xs font-medium text-slate-600 leading-relaxed">
+              <span className="font-bold text-slate-800">टिप:</span> पत्ती या रोगग्रस्त हिस्से की साफ़ और नज़ादीक से फोटो लें।
+            </p>
+          </div>
         </div>
       ) : (
         /* Image Preview Card */
-        <div className="relative rounded-3xl overflow-hidden shadow-xl border-2 border-emerald-300 mb-5 bg-black">
+        <div className="relative rounded-[2rem] overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.08)] mb-6 bg-slate-100 h-64 border border-slate-200">
           {imagePreview && (
             <img
               src={imagePreview}
               alt="Crop upload"
-              className="w-full h-56 object-cover"
+              className="w-full h-full object-cover"
             />
           )}
           
-          <div className="absolute top-3 right-3 bg-emerald-800/90 text-white px-3 py-1 rounded-full text-xs font-bold backdrop-blur-md shadow-md flex items-center gap-1.5">
+          {/* Scanning Line Animation */}
+          {isAnalyzing && (
+            <motion.div
+              className="absolute left-0 right-0 h-1 bg-[#16a34a] shadow-[0_0_15px_4px_rgba(22,163,74,0.6)] z-10"
+              animate={{ top: ['0%', '100%', '0%'] }}
+              transition={{ repeat: Infinity, duration: 2.5, ease: "linear" }}
+            />
+          )}
+
+          <div className="absolute top-4 right-4 bg-white/90 text-slate-800 px-3 py-1.5 rounded-full text-xs font-bold backdrop-blur-md shadow-sm flex items-center gap-1.5">
             {isAnalyzing ? (
               <>
-                <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                <RefreshCw className="w-3.5 h-3.5 animate-spin text-[#16a34a]" />
                 <span>AI जांच रहा है...</span>
               </>
             ) : (
               <>
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-300" />
+                <CheckCircle2 className="w-3.5 h-3.5 text-[#16a34a]" />
                 <span>जांच पूर्ण</span>
               </>
             )}
@@ -302,7 +332,7 @@ export function ImageAnalysisScreen() {
           {!isAnalyzing && (
             <button 
               onClick={resetAnalysis}
-              className="absolute bottom-3 right-3 bg-white/95 text-emerald-950 px-3 py-1.5 rounded-full text-xs font-bold backdrop-blur-md shadow-md hover:bg-white active:scale-95 transition-all flex items-center gap-1"
+              className="absolute bottom-4 right-4 bg-white/95 text-slate-800 px-3 py-1.5 rounded-full text-xs font-bold backdrop-blur-md shadow-sm hover:bg-white active:scale-95 transition-all flex items-center gap-1 border border-slate-200"
             >
               <RefreshCw className="w-3.5 h-3.5" />
               <span>नई फोटो</span>
@@ -311,115 +341,94 @@ export function ImageAnalysisScreen() {
         </div>
       )}
 
-      {/* Analyzing Loading Spinner */}
+      {/* Analyzing Loading Text (Optional, keeping minimal since we have scanning line) */}
       {isAnalyzing && (
-        <div className="bg-white/95 rounded-3xl p-6 text-center shadow-lg border border-emerald-100 mb-5">
-          <div className="w-12 h-12 border-4 border-emerald-600 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
-          <p className="font-bold text-emerald-950 text-base">FarmWhisper AI जांच कर रहा है...</p>
-          <p className="text-xs text-emerald-700 font-medium mt-1">रोग, कीट और सटीक दवा का विश्लेषण जारी है</p>
+        <div className="text-center mt-4">
+          <p className="font-bold text-slate-800 text-sm">FarmWhisper AI जांच कर रहा है...</p>
         </div>
       )}
 
       {/* Structured Diagnosis Results Card */}
       {analysisResult && (
         <div className="space-y-4">
-          {/* Main Crop & Issue Card */}
-          <div className="bg-white rounded-3xl p-5 shadow-xl border border-emerald-200">
-            <div className="flex justify-between items-start mb-3">
-              <div>
-                <span className="text-[10px] uppercase tracking-wider font-bold text-emerald-700">पहचानी गई फसल</span>
-                <h2 className="text-emerald-950 text-xl font-black">
-                  🌱 {analysisResult.crop_identified}
-                </h2>
-              </div>
-
-              {/* Confidence Score Pill */}
-              <div className="bg-emerald-100 text-emerald-900 border border-emerald-300 px-3 py-1 rounded-2xl text-center shadow-sm">
-                <p className="text-sm font-black">{Math.round((analysisResult.confidence_score || 0.9) * 100)}%</p>
-                <p className="text-[8px] uppercase tracking-wider font-bold text-emerald-700">सटीकता</p>
-              </div>
+          {/* Main Crop Card */}
+          <div className="bg-white rounded-[2rem] p-5 shadow-[0_4px_20px_-10px_rgba(0,0,0,0.05)] border border-slate-100 flex items-center justify-between">
+            <div>
+              <span className="text-[10px] uppercase tracking-wider font-bold text-[#16a34a]">पहचानी गई फसल</span>
+              <h2 className="text-slate-800 text-lg font-black mt-0.5">
+                {analysisResult.crop_identified}
+              </h2>
             </div>
-
-            {/* Issue Status Pill */}
-            <div className={`p-3 rounded-2xl border ${
-              analysisResult.issue_detected?.toLowerCase().includes('healthy') || analysisResult.issue_detected?.toLowerCase().includes('स्वस्थ')
-                ? 'bg-emerald-50 border-emerald-300 text-emerald-900'
-                : 'bg-red-50 border-red-300 text-red-950'
-            }`}>
-              <p className="text-[10px] uppercase tracking-wider font-bold opacity-80">लक्षण / रोग (Issue):</p>
-              <p className="text-sm font-bold mt-0.5">
-                ⚠️ {analysisResult.issue_detected}
-              </p>
+            
+            <div className="text-right">
+              <span className="text-[10px] uppercase tracking-wider font-bold text-slate-400">सटीकता</span>
+              <h2 className="text-[#16a34a] text-lg font-black mt-0.5">
+                {Math.round((analysisResult.confidence_score || 0.9) * 100)}%
+              </h2>
             </div>
           </div>
 
-          {/* Detailed Diagnosis Description */}
-          {analysisResult.treatment_plan?.fault_description && (
-            <div className="bg-white rounded-3xl p-5 shadow-lg border border-gray-100">
-              <h3 className="text-xs uppercase tracking-wider font-bold text-gray-500 mb-2 flex items-center gap-1.5">
-                <AlertTriangle className="w-4 h-4 text-amber-600" />
-                <span>निदान विवरण (Diagnosis Details)</span>
-              </h3>
-              <p className="text-xs text-gray-800 leading-relaxed font-medium">
-                {analysisResult.treatment_plan.fault_description}
-              </p>
+          <div className="bg-white rounded-[2rem] p-5 shadow-[0_4px_20px_-10px_rgba(0,0,0,0.05)] border border-slate-100">
+            <h3 className="text-sm font-black text-[#16a34a] mb-3">निदान विवरण / Diagnosis Details</h3>
+            
+            <div className="flex items-start gap-3 mb-4">
+              <div className="w-2 h-2 rounded-full bg-red-500 mt-1.5 flex-shrink-0"></div>
+              <div>
+                <p className="text-xs font-bold text-slate-800">समस्या (Issue)</p>
+                <p className="text-xs text-slate-500 font-medium leading-relaxed mt-0.5">
+                  {analysisResult.issue_detected}
+                </p>
+              </div>
             </div>
-          )}
+
+            {analysisResult.treatment_plan?.fault_description && (
+              <div className="flex items-start gap-3">
+                <div className="w-2 h-2 rounded-full bg-amber-500 mt-1.5 flex-shrink-0"></div>
+                <div>
+                  <p className="text-xs font-bold text-slate-800">विवरण</p>
+                  <p className="text-xs text-slate-500 font-medium leading-relaxed mt-0.5">
+                    {analysisResult.treatment_plan.fault_description}
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
 
           {/* Structured Treatment Plan */}
-          <div className="bg-white rounded-3xl p-5 shadow-xl border border-emerald-100 space-y-3.5">
-            <h3 className="text-sm font-black text-emerald-950 flex items-center gap-1.5">
-              <FlaskConical className="w-5 h-5 text-emerald-700" />
-              <span>उपचार एवं समाधान (Treatment Plan)</span>
-            </h3>
+          <div className="bg-[#16a34a] rounded-[2rem] p-6 shadow-[0_8px_30px_rgb(22,163,74,0.2)] text-white">
+            <h3 className="text-sm font-black mb-5">उपचार एवं समाधान (Treatment Plan)</h3>
 
             {/* Immediate Action */}
             {analysisResult.treatment_plan?.immediate_remedy && (
-              <div className="bg-amber-50/80 border-l-4 border-amber-500 rounded-2xl p-3.5">
-                <div className="flex items-start gap-2.5">
-                  <Droplets className="w-5 h-5 text-amber-700 mt-0.5 flex-shrink-0" />
-                  <div>
-                    <p className="text-xs font-bold text-amber-950">तत्काल उपाय (Immediate Action)</p>
-                    <p className="text-xs text-amber-900 mt-1 leading-relaxed font-medium">
-                      {analysisResult.treatment_plan.immediate_remedy}
-                    </p>
-                  </div>
-                </div>
+              <div className="mb-4">
+                <p className="text-xs font-bold text-green-100 uppercase tracking-wide">तत्काल उपाय</p>
+                <p className="text-sm font-semibold mt-1 leading-relaxed">
+                  {analysisResult.treatment_plan.immediate_remedy}
+                </p>
               </div>
             )}
 
             {/* Specific Chemicals / Pesticides */}
             {analysisResult.treatment_plan?.pesticides_fertilizers_required?.length > 0 && (
-              <div className="bg-emerald-50/80 border-l-4 border-emerald-600 rounded-2xl p-3.5">
-                <div className="flex items-start gap-2.5">
-                  <Bug className="w-5 h-5 text-emerald-700 mt-0.5 flex-shrink-0" />
-                  <div className="w-full">
-                    <p className="text-xs font-bold text-emerald-950">अनुशंसित दवा व खुराक (Chemicals & Dosage)</p>
-                    <div className="space-y-1.5 mt-2">
-                      {analysisResult.treatment_plan.pesticides_fertilizers_required.map((chem: string, i: number) => (
-                        <div key={i} className="text-xs text-emerald-950 bg-white px-3 py-2 rounded-xl border border-emerald-200 shadow-sm font-semibold flex items-center gap-2">
-                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
-                          <span>{chem}</span>
-                        </div>
-                      ))}
+              <div className="mb-4">
+                <p className="text-xs font-bold text-green-100 uppercase tracking-wide mb-2">दवा व खुराक</p>
+                <div className="space-y-2">
+                  {analysisResult.treatment_plan.pesticides_fertilizers_required.map((chem: string, i: number) => (
+                    <div key={i} className="bg-white/10 rounded-xl px-3 py-2 text-sm font-semibold border border-white/20 backdrop-blur-sm">
+                      {chem}
                     </div>
-                  </div>
+                  ))}
                 </div>
               </div>
             )}
 
             {/* Preventative Care */}
             {analysisResult.treatment_plan?.preventative_care && (
-              <div className="bg-green-50/80 border-l-4 border-green-600 rounded-2xl p-3.5">
-                <div className="flex items-start gap-2.5">
-                  <Leaf className="w-5 h-5 text-green-700 mt-0.5 flex-shrink-0" />
-                  <div>
-                    <p className="text-xs font-bold text-green-950">भविष्य में बचाव (Preventative Care)</p>
-                    <p className="text-xs text-green-900 mt-1 leading-relaxed font-medium">
-                      {analysisResult.treatment_plan.preventative_care}
-                    </p>
-                  </div>
-                </div>
+              <div>
+                <p className="text-xs font-bold text-green-100 uppercase tracking-wide">बचाव</p>
+                <p className="text-sm font-semibold mt-1 leading-relaxed opacity-90">
+                  {analysisResult.treatment_plan.preventative_care}
+                </p>
               </div>
             )}
           </div>
